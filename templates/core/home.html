@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <section class="bg-gradient-to-r from-emerald-700 to-emerald-900 text-white py-16 md:py-24">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6">Не забудьте порадовать близких</h1>
+            <p class="text-xl mb-8 max-w-2xl mx-auto">Самые свежие букеты с доставкой за 2 часа. Эмоции, которые остаются надолго.</p>
+            <a href="#order" class="inline-block bg-amber-400 text-emerald-900 font-semibold px-8 py-3 rounded-full hover:bg-amber-300 hover:scale-105 transition-all duration-300 shadow-lg">Заказать сейчас</a>
+        </div>
+    </section>
+
+    <section id="catalog" class="py-12">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-10 text-emerald-800">Наши букеты</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for product in products %}
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-64 object-cover">
+                        {% else %}
+                            <div class="w-full h-64 bg-gradient-to-br from-emerald-100 to-amber-100 flex items-center justify-center">
+                                <i class="fas fa-flower text-6xl text-emerald-500"></i>
+                            </div>
+                        {% endif %}
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2 text-emerald-800">{{ product.name }}</h3>
+                            <p class="text-gray-600 mb-4">{{ product.description|truncatechars:100 }}</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-2xl font-bold text-amber-600">{{ product.price }} ₽</span>
+                                <button onclick="scrollToOrder('{{ product.id }}')" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 hover:scale-105 transition">Выбрать</button>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-span-full text-center py-12">
+                        <i class="fas fa-seedling text-6xl text-emerald-400 mb-4"></i>
+                        <p class="text-xl text-gray-600">Скоро здесь появятся новые букеты!</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section id="order" class="py-12 bg-gradient-to-b from-white to-emerald-50">
+        <div class="container mx-auto px-4 max-w-2xl">
+            <h2 class="text-3xl font-bold text-center mb-10 text-emerald-800">Оформить заказ</h2>
+            <div class="bg-white p-8 rounded-2xl shadow-xl">
+                <form method="post" action="{% url 'create_order' %}">
+                    {% csrf_token %}
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-gray-700 mb-2">{{ form.customer_name.label }}</label>
+                            {{ form.customer_name }}
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">{{ form.customer_email.label }}</label>
+                            {{ form.customer_email }}
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">{{ form.customer_phone.label }}</label>
+                            {{ form.customer_phone }}
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">{{ form.product.label }}</label>
+                            {{ form.product }}
+                        </div>
+                        <button type="submit" class="w-full bg-emerald-700 text-white font-semibold py-3 rounded-lg hover:bg-emerald-800 hover:scale-[1.02] transition-all duration-300">
+                            <i class="fas fa-paper-plane mr-2"></i> Отправить заказ
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section id="contacts" class="py-12">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-8 text-emerald-800">Как нас найти</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                    <i class="fas fa-clock text-4xl text-emerald-600 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-4">Время работы</h3>
+                    <p class="text-gray-700">Ежедневно с 9:00 до 21:00</p>
+                    <p class="text-gray-700">Доставка: круглосуточно</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                    <i class="fas fa-truck text-4xl text-emerald-600 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-4">Доставка</h3>
+                    <p class="text-gray-700">По Москве — 2 часа</p>
+                    <p class="text-gray-700">По области — от 4 часов</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function scrollToOrder(productId) {
+            document.querySelector('#order').scrollIntoView({ behavior: 'smooth' });
+            const select = document.querySelector('select[name="product"]');
+            if (select) select.value = productId;
+        }
+        setTimeout(() => {
+            const messages = document.querySelectorAll('.fixed > div');
+            messages.forEach(msg => {
+                setTimeout(() => {
+                    msg.style.transform = 'translateX(100%)';
+                    setTimeout(() => msg.remove(), 300);
+                }, 3000);
+            });
+        }, 100);
+    </script>
+{% endblock %}
